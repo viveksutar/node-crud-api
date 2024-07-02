@@ -34,7 +34,7 @@ const hotCategoryProductsGet = asyncHandler(async (req, res, next) => {
 const productCreate = asyncHandler(async (req, res, next) => {
   const { name, description, price, discount, category, subcategory } =
     req.body;
-
+    console.log(req.files);
   const product = await Product.create({
     name: name,
     description: description,
@@ -44,23 +44,37 @@ const productCreate = asyncHandler(async (req, res, next) => {
     subcategory: subcategory,
     status: true,
   });
+
   if (product) {
-    return res.status(200).json({ success: true, data: product });
+    product.images = req.files.map(
+      (image) => "public/products/" + image.filename
+    );
+    return res.status(200).json({
+      success: true,
+      data: product,
+      // filename: filename
+    });
   }
   return res
     .status(500)
     .json({ success: false, message: "something went wrong" });
 });
 
-const productDelete = asyncHandler(async(req,res,next)=>{
+const productDelete = asyncHandler(async (req, res, next) => {
   const { id } = req.params;
   const product = await Product.findByIdAndDelete(id);
-  if(product){
-    return res.status(200).json({ success: true, message:"Product deleted" });
+  if (product) {
+    return res.status(200).json({ success: true, message: "Product deleted" });
   }
   return res
     .status(500)
     .json({ success: false, message: "something went wrong" });
-})
+});
 
-export { productAll, productGet, hotCategoryProductsGet, productCreate ,productDelete};
+export {
+  productAll,
+  productGet,
+  hotCategoryProductsGet,
+  productCreate,
+  productDelete,
+};

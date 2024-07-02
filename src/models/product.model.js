@@ -37,12 +37,29 @@ const productSchema = Schema(
         ref: "HotCategory",
       },
     ],
+    images: [
+      {
+        type: String,
+      },
+    ],
     status: {
       type: Boolean,
       default: true,
     },
   },
-  { toJSON: { virtuals: true }, timestamps: true }
+  {
+    toJSON: {
+      virtuals: true,
+      transform: function (doc, ret) {
+        // Transform the images field to include full URLs
+        if (ret.images) {
+          ret.images = ret.images.map(image => process.env.BASE_URL +'/'+ image);
+        }
+        return ret;
+      },
+    },
+    timestamps: true,
+  }
 );
 
 productSchema.virtual("discounted_price").get(function () {
@@ -52,6 +69,11 @@ productSchema.virtual("discounted_price").get(function () {
   }
   return value;
 });
+
+// Virtual for image URLs
+// productSchema.virtual("images").get(function () {
+//   return this.images.map((image) => process.env.APP_URL + image);
+// });
 
 const Product = mongoose.model("Product", productSchema);
 export { productSchema };

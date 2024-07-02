@@ -1,8 +1,8 @@
 import express from "express";
 import cors from "cors";
-
+import path from 'path';
 const app = express();
-
+import { fileURLToPath } from "url";
 app.use(
   cors()
   // cors({
@@ -12,8 +12,7 @@ app.use(
 );
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-app.use(express.static("public"));
-
+app.use('/public',express.static("public"));
 //import routes here
 import authRoutes from "./routes/api/auth.route.js";
 import usersRoutes from "./routes/api/user.route.js";
@@ -24,6 +23,8 @@ import { home } from "./controllers/api/home.controller.js";
 import { authenticatedUser } from "./middlewares/auth.middleware.js";
 import globalErrorHandler from "./middlewares/error.middleware.js";
 //declare routes here
+
+
 app.use("/api/v1/home", home);
 app.use("/api/v1/auth", authRoutes);
 app.use(authenticatedUser);
