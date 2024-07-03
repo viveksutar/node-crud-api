@@ -34,7 +34,7 @@ const hotCategoryProductsGet = asyncHandler(async (req, res, next) => {
 const productCreate = asyncHandler(async (req, res, next) => {
   const { name, description, price, discount, category, subcategory } =
     req.body;
-    console.log(req.files);
+  console.log(req.files);
   const product = await Product.create({
     name: name,
     description: description,
@@ -46,9 +46,11 @@ const productCreate = asyncHandler(async (req, res, next) => {
   });
 
   if (product) {
-    product.images = req.files.map(
-      (image) => "public/products/" + image.filename
-    );
+    if (req.files) {
+      product.images = req.files.map(
+        (image) => "public/products/" + image.filename
+      );
+    }
     return res.status(200).json({
       success: true,
       data: product,
@@ -71,10 +73,31 @@ const productDelete = asyncHandler(async (req, res, next) => {
     .json({ success: false, message: "something went wrong" });
 });
 
+const productUpdate = asyncHandler(async (req, res, next) => {
+  const { id } = req.params;
+  const product = await Product.findByIdAndUpdate(id, req.body, {
+    new: true,
+  })
+    .then((product) => {
+      if (!product) {
+        return res.status(404).send({
+          message: "not found",
+        });
+      }
+      return res.json(product);
+    })
+    .catch((err) => {
+      return res.status(500).send({
+        message: "Error updating ",
+      });
+    });
+});
+
 export {
   productAll,
   productGet,
   hotCategoryProductsGet,
   productCreate,
   productDelete,
+  productUpdate,
 };
